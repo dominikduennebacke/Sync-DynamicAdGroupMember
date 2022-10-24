@@ -12,13 +12,13 @@ Manages AD group members based on Get-ADUser filter query defined in an `extensi
 ```
 
 ## Description
-The Sync-DynamicAdGroupMember.ps1 loops thru all AD groups that have a Get-ADUser filter query defined on a speficied extensionAttribute.
-The script then fetches all AD users that match the query and syncs them with the groups members.
+The Sync-DynamicAdGroupMember.ps1 script loops thru all AD groups that have a Get-ADUser filter query defined on a speficied `extensionAttribute`.
+The script then fetches all AD users that match the query and syncs them with the group's members.
 This means missing members are added and obsolete members are removed.
 Manual changes to the members of the group are overwritten.
 
 ### Use case
-Dynamic groups is a very useful feature in Azure AD. Since many organizations still use Active Directory as their source of truth for users, the same functionality can be useful there too.
+Dynamic groups is a very useful feature in Azure AD. Since many organizations still use Active Directory as their source of truth for users, the same functionality can be useful here too.
 
 ### Requirements
 * PowerShell module [ActiveDirectory](https://learn.microsoft.com/en-us/powershell/module/activedirectory/?view=windowsserver2022-ps)
@@ -47,7 +47,9 @@ VERBOSE: Checking dependencies
 VERBOSE: The secure channel between the local computer and the domain is in good condition.
 VERBOSE: Fetching AD groups with a value in extensionAttribute10
 VERBOSE: Syncing group members
-VERBOSE: role-department-sales: department -eq 'sales'
+VERBOSE: role-type-employee: (employeeType -eq 'Employee') -and (Enabled -eq $true)
+VERBOSE: role-department-marketing: department -eq 'Marketing'
+VERBOSE: role-department-sales: department -eq 'Sales'
 VERBOSE: role-department-sales: (+) john.doe
 VERBOSE: role-department-sales: (+) sam.smith
 VERBOSE: role-department-sales: (-) tom.tonkins
