@@ -1,14 +1,14 @@
 # Sync-DynamicAdGroupMember
 
 ## Links
-* [Blog post on autofocus.duennebacke.com how to use this script](https://autofocus.duennebacke.com/2022/10/10/dynamic-active-directory-groups/)
+* [Blog post](https://autofocus.duennebacke.com/2022/10/10/dynamic-active-directory-groups/) on autofocus.duennebacke.com for a pratical example using the script
 
 ## Synopsis
 Manages AD group members based on Get-ADUser filter query defined in an `extensionAttribute`.
 
 ## Syntax
 ```powershell
-.\Sync-DynamicAdGroupMember.ps1 -extensionAttribute <int> [-SearchBase <String>] [-Server <String>] [-WhatIf] [-PassThru] [-VERBOSE]
+.\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute <int> [-SearchBase <String>] [-Server <String>] [-WhatIf] [-PassThru] [-VERBOSE]
 ```
 
 ## Description
@@ -40,7 +40,7 @@ After configuring the Get-ADUser filter query on a few group pairs keep an eye o
 ### Example 1
 Syncs all members for groups that have a filter query set in `extensionAttribute10` and provides output.
 ```powershell
-.\Sync-DynamicAdGroupMember.ps1 -extensionAttribute 10 -VERBOSE
+.\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute 10 -VERBOSE
 ```
 ```
 VERBOSE: Checking dependencies
@@ -56,7 +56,7 @@ VERBOSE: role-department-sales: (-) tom.tonkins
 ### Example 2
 Provides output of sync changes but does not actually perform them.
 ```powershell
-.\Sync-DynamicAdGroupMember.ps1 -extensionAttribute 10 -WhatIf:$true
+.\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute 10 -WhatIf:$true
 ```
 ```
 What if: role-department-sales: (+) john.doe
@@ -67,7 +67,7 @@ What if: role-department-sales: (-) tom.tonkins
 ### Example 3
 Provides output of sync changes but does not actually perform them, with additional output.
 ```powershell
-.\Sync-DynamicAdGroupMember.ps1 -extensionAttribute 10 -WhatIf:$true -VERBOSE
+.\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute 10 -WhatIf:$true -VERBOSE
 ```
 ```
 VERBOSE: Checking dependencies
@@ -81,14 +81,15 @@ What if: role-department-sales: (-) tom.tonkins
 ```
 
 ### Example 4
-Only consideres the OU "OU=groups,DC=contoso,DC=com" looking for groups with `extensionAttribute10` set. This can speed up execution.
+Only consideres the OU `OU=groups,DC=contoso,DC=com` looking for groups with extensionAttribute10 set.
+Only consideres the OU `OU=users,DC=contoso,DC=com` looking for users when executing the Get-ADUser filter query.
+This can speed up execution.
 ```powershell
-.\Sync-DynamicAdGroupMember.ps1 -extensionAttribute 10 -SearchBase "OU=groups,DC=contoso,DC=com"
+.\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute 10 -GroupSearchBase "OU=groups,DC=contoso,DC=com" -UserSearchBase "OU=users,DC=contoso,DC=com"
 ```
-
 ## Parameters
 
-### -extensionAttribute
+### -ExtensionAttribute
 extensionAttribute where the Get-ADUser filter query is specified in AD groups.
 
 ```yaml
@@ -103,8 +104,23 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SearchBase
-Specifies an Active Directory path to search under.
+### -GroupSearchBase
+Specifies an Active Directory path to search for groups.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -UserSearchBase
+Specifies an Active Directory path to search for users.
 
 ```yaml
 Type: String

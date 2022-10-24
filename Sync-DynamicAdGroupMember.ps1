@@ -29,7 +29,7 @@
     .EXAMPLE
     Syncs all members for groups that have a filter query set in extensionAttribute10 and provides output.
 
-    .\Sync-DynamicAdGroupMember.ps1 -extensionAttribute 10 -VERBOSE
+    .\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute 10 -VERBOSE
 
     VERBOSE: Checking dependencies
     VERBOSE: The secure channel between the local computer and the domain is in good condition.
@@ -43,7 +43,7 @@
     .EXAMPLE
     Provides output of sync changes but does not actually perform them.
 
-    .\Sync-DynamicAdGroupMember.ps1 -extensionAttribute 10 -WhatIf:$true
+    .\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute 10 -WhatIf:$true
 
     What if: role-department-sales: (+) john.doe
     What if: role-department-sales: (+) sam.smith
@@ -52,7 +52,7 @@
     .EXAMPLE
     Provides output of sync changes but does not actually perform them, with additional output.
 
-    .\Sync-DynamicAdGroupMember.ps1 -extensionAttribute 10 -WhatIf:$true -VERBOSE
+    .\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute 10 -WhatIf:$true -VERBOSE
 
     VERBOSE: Checking dependencies
     VERBOSE: The secure channel between the local computer and the domain is in good condition.
@@ -64,9 +64,11 @@
     What if: role-department-sales: (-) tom.tonkins
     
     .EXAMPLE
-    Only consideres the OU "OU=groups,DC=contoso,DC=com" looking for groups with extensionAttribute10 set. This can speed up execution.
+    Only consideres the OU "OU=groups,DC=contoso,DC=com" looking for groups with extensionAttribute10 set.
+    Only consideres the OU "OU=users,DC=contoso,DC=com" looking for users when executing the Get-ADUser filter query.
+    This can speed up execution.
 
-    .\Sync-DynamicAdGroupMember.ps1 -extensionAttribute 10 -SearchBase "OU=groups,DC=contoso,DC=com"
+    .\Sync-DynamicAdGroupMember.ps1 -ExtensionAttribute 10 -GroupSearchBase "OU=groups,DC=contoso,DC=com" -UserSearchBase "OU=users,DC=contoso,DC=com"
 #>
 
 
@@ -78,8 +80,11 @@ param (
     [ValidateRange(1, 15)]
     [int]$ExtensionAttribute,
 
-    # Specifies an Active Directory path to search under
-    [string]$SearchBase,
+    # Specifies an Active Directory path to search for groups
+    [string]$GroupSearchBase,
+
+    # Specifies an Active Directory path to search for users
+    [string]$UserSearchBase,
 
     # Specifies the Active Directory Domain Services instance to connect to
     [string]$Server,
@@ -116,9 +121,14 @@ if (-not (Test-ComputerSecureChannel -Server $Server)) {
     throw "Connection to $Server failed"
 }
 
-# Determine SearchBase if not set (as cmdlets do not allow an empty SearchBase)
-if (-not $SearchBase) {
-    $SearchBase = (Get-ADDomain -Server $Server).DistinguishedName
+# Determine GroupSearchBase if not set (as cmdlets do not allow an empty SearchBase)
+if (-not $GroupSearchBase) {
+    $GroupSearchBase = (Get-ADDomain -Server $Server).DistinguishedName
+}
+
+# Determine UserSearchBase if not set (as cmdlets do not allow an empty SearchBase)
+if (-not $UserSearchBase) {
+    $UserSearchBase = (Get-ADDomain -Server $Server).DistinguishedName
 }
 
 # Store extensionAttribute as string
@@ -132,7 +142,7 @@ Write-Verbose "Fetching AD groups with extensionAttribute set"
 
 # Fetching AD groups
 $Params = @{
-    SearchBase = $SearchBase
+    SearchBase = $GroupSearchBase
     Filter     = "$ExtensionAttributeString -like '*'"
     Server     = $Server
     Properties = $ExtensionAttributeString
@@ -148,10 +158,10 @@ Write-Verbose "Syncing group members"
 foreach ($Group in $AdGroups) {
 
     # Output for reference
-    Write-Verbose "$($Group.Name): $($Group.ExtensionAttributeString)"
+    Write-Verbose "$($Group.Name): $($Group.$ExtensionAttributeString)"
 
     # Fetch AD users from query
-    $MembersQuery = Get-ADUser -Filter $Group.ExtensionAttributeString -Server $Server | Sort-Object SamAccountName
+    $MembersQuery = Get-ADUser -Filter $Group.$ExtensionAttributeString -Server $Server -SearchBase $UserSearchBase | Sort-Object SamAccountName
 
     # Fetch current members of AD group
     $MembersCurrent = $Group | Get-ADGroupMember -Server $Server | Sort-Object SamAccountName
