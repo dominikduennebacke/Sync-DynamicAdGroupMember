@@ -1,8 +1,5 @@
 # Sync-DynamicAdGroupMember
 
-## Links
-* [Blog post](https://autofocus.duennebacke.com/2022/10/10/dynamic-active-directory-groups/) on autofocus.duennebacke.com for a pratical example using the script
-
 ## Synopsis
 Manages AD group members based on Get-ADUser filter query defined in an `extensionAttribute`.
 
