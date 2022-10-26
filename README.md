@@ -1,9 +1,9 @@
 # Sync-DynamicAdGroupMember
 
-<a href="https://www.buymeacoffee.com/dduennebacke" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
 ## Links
 * [Blog post](https://autofocus.duennebacke.com/2022/10/10/dynamic-active-directory-groups/) on autofocus.duennebacke.com for a pratical example using the script
+* Like what you see?  
+  <a href="https://www.buymeacoffee.com/dduennebacke" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 ## Synopsis
 Manages AD group members based on Get-ADUser filter query defined in an `extensionAttribute`.
